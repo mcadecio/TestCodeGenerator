@@ -1,13 +1,13 @@
 package com.ddaio.testcodegen.generator.testcode;
 
 import com.ddaio.testcodegen.generator.Generator;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestCodeGeneratorTest {
 
@@ -78,7 +78,17 @@ class TestCodeGeneratorTest {
     @Test
     @DisplayName("Generates 2 test codes with two different passwords")
     void generates2CodesWithDifferentPasswords() {
+        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
+                "MIM",
+                10,
+                6,
+                RandomStringUtils::randomAlphanumeric
+        );
 
+        TestCodeGenerationResult result = generator.generate(2);
+
+        List<TestCode> testCodes = result.getTestCodes();
+        assertNotEquals(testCodes.get(1).getPassword(), testCodes.get(0).getPassword());
     }
 
     private void assertAllTestCodesStartWith(String startingBase, List<TestCode> testCodes, int quantity) {

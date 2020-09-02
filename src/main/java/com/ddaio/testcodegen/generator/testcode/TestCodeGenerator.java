@@ -14,7 +14,6 @@ public class TestCodeGenerator implements Generator<TestCodeGenerationResult> {
     private final int startingNumber;
     private final Generator<String> passwordGenerator;
 
-    @Inject
     public TestCodeGenerator(
             String base,
             int startingNumber,
