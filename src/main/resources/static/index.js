@@ -12,6 +12,12 @@ document.getElementById("main-form").addEventListener("submit", (e) => {
     console.log("passwordLength == " + passwordLength);
     console.log("quantity == " + quantity);
 
-    fetch("/api/generate/raw?s")
+    fetch(
+        "/api/generate/csv?base=" + base
+        + "&startingNumber=" + startingNumber
+        + "&passwordLength=" + passwordLength
+        + "&quantity=" + quantity)
+        .then((result) => result.json())
+        .then(json => console.log(json))
     e.preventDefault();
 })

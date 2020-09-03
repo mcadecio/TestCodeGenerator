@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,8 @@ public class Server extends AbstractVerticle {
 
         final var router = Router.router(vertx);
 
-        router.get("/").handler(rc -> rc.response().end("Hello, World!"));
+        router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
+        router.get("/*").handler(StaticHandler.create("static"));
 
         router.get("/api/generate/*").handler(logRequestInformation());
         router.get("/api/generate/csv").handler(handleGenerateCSVRequest());
