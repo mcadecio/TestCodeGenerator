@@ -1,5 +1,5 @@
 # TestCodeGenerator
-A simple web-based tool to create Test Codes. These codes are generated into a csv and download to your PC
+A simple web-based tool to create Test Codes. These codes are generated into a csv and downloaded to your PC
 
 # Architecture
 Backend Designed with a reactive library (Vert.x) and Java 11
