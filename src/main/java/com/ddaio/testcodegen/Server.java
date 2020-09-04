@@ -1,17 +1,19 @@
 package com.ddaio.testcodegen;
 
+import com.ddaio.testcodegen.generator.testcode.SimpleTestCodeGenerator;
+import com.ddaio.testcodegen.generator.testcode.TestCode;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationRequest;
 import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
-import com.ddaio.testcodegen.generator.testcode.TestCodeGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ddaio.testcodegen.module.InjModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import io.vertx.core.*;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,10 @@ import java.util.stream.Collectors;
 
 public class Server extends AbstractVerticle {
 
+    private static final String REQUEST = "request";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Injector injector = Guice.createInjector(new InjModule());
 
     private HttpServer httpServer;
 
@@ -32,8 +37,8 @@ public class Server extends AbstractVerticle {
         router.get("/*").handler(StaticHandler.create("static"));
 
         router.get("/api/generate/*").handler(logRequestInformation());
-        router.get("/api/generate/csv").handler(handleGenerateCSVRequest());
-        router.get("/api/generate/raw").handler(handleGenerateRawRequest());
+        router.get("/api/generate/simple/csv").handler(handleGenerateCSVRequest());
+        router.get("/api/generate/simple/raw").handler(handleGenerateRawRequest());
 
         httpServer = vertx.createHttpServer();
         httpServer
@@ -49,10 +54,13 @@ public class Server extends AbstractVerticle {
     private Handler<RoutingContext> logRequestInformation() {
         return rc -> {
             MultiMap queryParams = rc.queryParams();
-            logger.info("Query param: \"base\" == {}", queryParams.get("base"));
-            logger.info("Query param: \"startingNumber\" == {}", queryParams.get("startingNumber"));
-            logger.info("Query param: \"passwordLength\" == {}", queryParams.get("passwordLength"));
-            logger.info("Query param: \"quantity\" == {}", queryParams.get("quantity"));
+            TestCodeGenerationRequest request = paramsToTestCodeRequest(queryParams);
+            rc.put(REQUEST, request);
+            logger.info("Query param: \"loginBase\" == {}", request.getLoginBase());
+            logger.info("Query param: \"loginStartingNumber\" == {}", request.getLoginStartingNumber());
+            logger.info("Query param: \"passwordLength\" == {}",request.getPasswordLength());
+            logger.info("Query param: \"quantity\" == {}", request.getQuantity());
+            logger.info("Query param: \"allocatedTo\" == {}", request.getAllocatedTo());
             rc.next();
         };
     }
@@ -60,7 +68,7 @@ public class Server extends AbstractVerticle {
     private Handler<RoutingContext> handleGenerateRawRequest() {
         return rc -> {
 
-            TestCodeGenerationResult generationResult = generateTestCodes(rc.queryParams());
+            TestCodeGenerationResult generationResult = generateTestCodes(rc.remove(REQUEST));
 
             try {
                 String resultJson = new ObjectMapper().writeValueAsString(generationResult);
@@ -76,20 +84,19 @@ public class Server extends AbstractVerticle {
 
     private Handler<RoutingContext> handleGenerateCSVRequest() {
         return rc -> {
-            MultiMap queryParams = rc.queryParams();
 
-            TestCodeGenerationResult generationResult = generateTestCodes(queryParams);
+            TestCodeGenerationResult generationResult = generateTestCodes(rc.remove(REQUEST));
 
-            String content = "username,password\n";
-            content += generationResult.getTestCodes()
+            String headers = "Allocated to,Country,Login,Password,Number of Attempts\n";
+            String content = generationResult.getTestCodes()
                     .stream()
-                    .map(testCode -> testCode.getUsername() + "," + testCode.getPassword())
+                    .map(TestCode::toString)
                     .collect(Collectors.joining("\n"));
             try {
                 rc.response()
                         .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
                         .putHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=test_codes.csv")
-                        .end(Buffer.buffer(content));
+                        .end(headers + content);
 
             } catch (Exception e) {
                 rc.response().end("Error: " + e.getMessage());
@@ -98,13 +105,19 @@ public class Server extends AbstractVerticle {
         };
     }
 
-    private TestCodeGenerationResult generateTestCodes(MultiMap queryParams) {
-        return new TestCodeGenerator(
-                queryParams.get("base"),
-                Integer.parseInt(queryParams.get("startingNumber")),
-                Integer.parseInt(queryParams.get("passwordLength")),
-                RandomStringUtils::randomAlphanumeric
-        ).generate(Integer.parseInt(queryParams.get("quantity")));
+    private TestCodeGenerationRequest paramsToTestCodeRequest(MultiMap queryParams) {
+        return new TestCodeGenerationRequest()
+                .setAllocatedTo(queryParams.get("allocatedTo"))
+                .setLoginBase(queryParams.get("loginBase"))
+                .setLoginStartingNumber(Integer.parseInt(queryParams.get("loginStartingNumber")))
+                .setPasswordLength(Integer.parseInt(queryParams.get("passwordLength")))
+                .setQuantity(Integer.parseInt(queryParams.get("quantity")));
+    }
+
+    private TestCodeGenerationResult generateTestCodes(TestCodeGenerationRequest request) {
+        return injector
+                .getInstance(SimpleTestCodeGenerator.class)
+                .generateTestCodes(request);
     }
 
     @Override

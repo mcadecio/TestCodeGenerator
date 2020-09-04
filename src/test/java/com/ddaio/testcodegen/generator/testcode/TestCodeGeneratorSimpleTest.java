@@ -9,21 +9,22 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestCodeGeneratorTest {
+class TestCodeGeneratorSimpleTest {
 
     private final Generator<String> defaultPasswordGenerator = l -> "password";
+    private final TestCodeGenerator generator = new SimpleTestCodeGenerator(defaultPasswordGenerator);
+    private final TestCodeGenerationRequest request = new TestCodeGenerationRequest()
+            .setAllocatedTo("Java")
+            .setLoginBase("SOUT")
+            .setLoginStartingNumber(10)
+            .setPasswordLength(6);
 
     @Test
     @DisplayName("Generates 0 test codes")
     void generate0TestCodes() {
-        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
-                "SOUT",
-                10,
-                6,
-                defaultPasswordGenerator
-        );
+        request.setQuantity(0);
 
-        TestCodeGenerationResult result = generator.generate(0);
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         assertEquals(0, result.getQuantity());
     }
@@ -31,14 +32,9 @@ class TestCodeGeneratorTest {
     @Test
     @DisplayName("Generates 10 test codes")
     void generates10TestCodes() {
-        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
-                "ABC",
-                10,
-                6,
-                defaultPasswordGenerator
-        );
+        request.setQuantity(10);
 
-        TestCodeGenerationResult result = generator.generate(10);
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         assertEquals(10, result.getQuantity());
         assertEquals(10, result.getTestCodes().size());
@@ -47,14 +43,10 @@ class TestCodeGeneratorTest {
     @Test
     @DisplayName("Generates test codes starting with MIM")
     void generatestestCodesStartingWithMIM() {
-        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
-                "MIM",
-                10,
-                6,
-                defaultPasswordGenerator
-        );
+        request.setLoginBase("MIM")
+                .setQuantity(3);
 
-        TestCodeGenerationResult result = generator.generate(3);
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         assertAllTestCodesStartWith("MIM", result.getTestCodes(), 3);
     }
@@ -62,14 +54,9 @@ class TestCodeGeneratorTest {
     @Test
     @DisplayName("Generates 0 test codes when the quantity is negative")
     void generates0CodesWhenQuantityIsNegative() {
-        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
-                "MIM",
-                10,
-                6,
-                defaultPasswordGenerator
-        );
+        request.setQuantity(-2);
 
-        TestCodeGenerationResult result = generator.generate(-2);
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         assertEquals(0, result.getTestCodes().size());
         assertEquals(-2, result.getQuantity());
@@ -78,14 +65,10 @@ class TestCodeGeneratorTest {
     @Test
     @DisplayName("Generates 2 test codes with two different passwords")
     void generates2CodesWithDifferentPasswords() {
-        Generator<TestCodeGenerationResult> generator = new TestCodeGenerator(
-                "MIM",
-                10,
-                6,
-                RandomStringUtils::randomAlphanumeric
-        );
+        TestCodeGenerator generator = new SimpleTestCodeGenerator(RandomStringUtils::randomAlphanumeric);
+        request.setQuantity(2);
 
-        TestCodeGenerationResult result = generator.generate(2);
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         List<TestCode> testCodes = result.getTestCodes();
         assertNotEquals(testCodes.get(1).getPassword(), testCodes.get(0).getPassword());
@@ -93,7 +76,7 @@ class TestCodeGeneratorTest {
 
     private void assertAllTestCodesStartWith(String startingBase, List<TestCode> testCodes, int quantity) {
         for (int i = 0; i < quantity; i++) {
-            assertTrue(testCodes.get(i).getUsername().startsWith(startingBase));
+            assertTrue(testCodes.get(i).getLogin().startsWith(startingBase));
         }
     }
 

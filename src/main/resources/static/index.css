@@ -1,0 +1,25 @@
+.bg-main {
+    background-color: #00283d !important;
+}
+
+.main-secondary-color {
+    color: #d6e03e;
+}
+
+
+.primary-color-text {
+    color: #00283d;
+}
+
+.secondary-color-text {
+    color: #d6e03e;
+}
+
+a:hover {
+    color: #d6e03e;
+}
+
+.alice-blue-text {
+    color: aliceblue
+
+}

@@ -1,23 +1,27 @@
-console.log("Hi There");
-document.getElementById("main-form").addEventListener("submit", (e) => {
-    let client = document.getElementById("client").value;
-    let base = document.getElementById("base").value;
-    let startingNumber = document.getElementById("startingNumber").value;
+document.getElementById("submit-form").addEventListener("click", (e) => {
+    let allocatedTo = document.getElementById("allocatedTo").value;
+    let loginBase = document.getElementById("loginBase").value;
+    let loginStartingNumber = document.getElementById("loginStartingNumber").value;
     let passwordLength = document.getElementById("passwordLength").value;
     let quantity = document.getElementById("quantity").value;
 
-    console.log("client == " + client);
-    console.log("base == " + base);
-    console.log("startingNumber == " + startingNumber);
+    console.log("allocatedTo == " + allocatedTo);
+    console.log("loginBase == " + loginBase);
+    console.log("loginStartingNumber == " + loginStartingNumber);
     console.log("passwordLength == " + passwordLength);
     console.log("quantity == " + quantity);
-
-    fetch(
-        "/api/generate/csv?base=" + base
-        + "&startingNumber=" + startingNumber
+    let url = "/api/generate/simple/csv?loginBase=" + loginBase
+        + "&loginStartingNumber=" + loginStartingNumber
         + "&passwordLength=" + passwordLength
-        + "&quantity=" + quantity)
-        .then((result) => result.json())
-        .then(json => console.log(json))
+        + "&quantity=" + quantity
+        + "&allocatedTo=" + allocatedTo;
+    window.location.replace(url);
+
     e.preventDefault();
+
+    document.getElementById("submit-form").reset();
+});
+
+document.getElementById('side-bar').addEventListener('click', function () {
+    document.getElementById('side-bar-activate').click();
 })
