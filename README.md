@@ -20,5 +20,8 @@ Frontend designed using HTML5, Materialize and Vanilla JavaScript
 * www.localhost:8080
 
 
-# In case you are wondering what it looks like
-link to file
+### In case you are wondering what it looks like
+https://github.com/mcadecio/TestCodeGenerator/example/frontend_pic.PNG
+
+### Example Output
+https://github.com/mcadecio/TestCodeGenerator/example/example_output.csv
