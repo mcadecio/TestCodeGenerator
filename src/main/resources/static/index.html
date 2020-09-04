@@ -19,8 +19,8 @@
     <div class="nav-wrapper bg-main">
         <a href="#" id="side-bar" style="padding-left: 1%" class="brand-logo left"><i
                 class="material-icons">menu</i></a>
-        <a href="#" class="brand-logo center"><span style="color: #d6e03e"> Password</span></a>
-        <a class="brand-logo right hide-on-small-and-down">Test Code Generator</a>
+        <a href="https://www.englishlanguagetesting.co.uk" class="brand-logo center"><span style="color: #d6e03e"> Password</span></a>
+        <a class="brand-logo right hide-on-small-and-down"><span style="color: white">Test Code Generator</span></a>
     </div>
 </nav>
 
@@ -36,40 +36,40 @@
     <div class="card" style="padding: 5%">
 
         <div class="row">
-            <form class="col s12">
+            <form class="col s12" onsubmit="submitForm(event)" >
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="allocatedTo" type="text" class="validate">
+                        <input id="allocatedTo" type="text" class="validate" required>
                         <label for="allocatedTo">Allocated To</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="loginBase" type="text" class="validate">
+                        <input id="loginBase" type="text" class="validate" required>
                         <label for="loginBase">Login Base</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="loginStartingNumber" type="number" class="validate">
+                        <input id="loginStartingNumber" type="number" class="validate" required>
                         <label for="loginStartingNumber">Login Starting Number</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="passwordLength" type="number" class="validate">
+                        <input id="passwordLength" type="number" class="validate" required>
                         <label for="passwordLength">Password Length</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="quantity" type="number" class="validate">
+                        <input id="quantity" type="number" class="validate" required>
                         <label for="quantity">Quantity</label>
                     </div>
                 </div>
                 <div class="center">
-                    <button class="btn waves-effect waves-light bg-main center btn-large" type="button" id="submit-form">Download
-                        Codes
+                    <button class="btn waves-effect waves-light bg-main center btn-large" type="submit"
+                            id="submit-form">Download Codes
                         <i class="material-icons right">arrow_downward</i>
                     </button>
                 </div>

@@ -3,23 +3,18 @@
 }
 
 .main-secondary-color {
-    color: #d6e03e;
+    color: #d6e03e !important;
 }
 
 
 .primary-color-text {
-    color: #00283d;
+    color: #00283d !important;
 }
 
 .secondary-color-text {
-    color: #d6e03e;
+    color: #d6e03e !important;
 }
 
 a:hover {
-    color: #d6e03e;
-}
-
-.alice-blue-text {
-    color: aliceblue
-
+    color: #d6e03e !important;
 }
