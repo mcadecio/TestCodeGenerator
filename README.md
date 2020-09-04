@@ -21,7 +21,7 @@ Frontend designed using HTML5, Materialize and Vanilla JavaScript
 
 
 ### In case you are wondering what it looks like
-https://github.com/mcadecio/TestCodeGenerator/example/frontend_pic.PNG
+https://github.com/mcadecio/TestCodeGenerator/blob/master/example/frontend_pic.PNG
 
 ### Example Output
-https://github.com/mcadecio/TestCodeGenerator/example/example_output.csv
+https://github.com/mcadecio/TestCodeGenerator/blob/master/example/example_output.csv
