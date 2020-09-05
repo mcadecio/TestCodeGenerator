@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Test</title>
+
+    <link rel="stylesheet" href="../index.css" crossorigin="anonymous">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+</head>
+<body>
+
+<nav>
+    <div class="nav-wrapper bg-main">
+        <a href="#" id="side-bar" style="padding-left: 1%" class="brand-logo left waves-effect waves-light"><i
+                class="material-icons">menu</i></a>
+        <a href="https://www.englishlanguagetesting.co.uk" class="brand-logo center"><span style="color: #d6e03e"> Password</span></a>
+        <a href="../index.html" class="brand-logo right hide-on-small-and-down waves-effect"><span style="color: white">Test Code Generator</span></a>
+    </div>
+</nav>
+<ul id="slide-out" style="background-color: #00283d;" class="sidenav">
+    <li><a href="simple-test-generator.html" style="color: white">Simple Test Code Generator</a></li>
+    <li><a href="skills-test-generator.html" style="color: white">Skills Test Code Generator</a></li>
+    <li><a href="random-login-test-generator.html" style="color: white">Random Login Test Code Generator</a></li>
+</ul>
+
+<a style="display: none" id="side-bar-activate" href="#" data-target="slide-out" class="sidenav-trigger"><i
+        class="material-icons">menu</i></a>
+
+<br>
+
+<div class="container">
+    <div class="card" style="padding: 5%">
+
+        <div class="row">
+            <form class="col s12" onsubmit="submitForm(event)">
+                <h3 class="header primary-color-text center-align">Simple Test Generator</h3>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="allocatedTo" type="text" class="validate" required>
+                        <label for="allocatedTo">Allocated To</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="loginBase" type="text" class="validate" required>
+                        <label for="loginBase">Login Base</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="loginStartingNumber" type="number" class="validate" required>
+                        <label for="loginStartingNumber">Login Starting Number</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="passwordLength" type="number" class="validate" required>
+                        <label for="passwordLength">Password Length</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="quantity" type="number" class="validate" required>
+                        <label for="quantity">Quantity</label>
+                    </div>
+                </div>
+                <div class="center">
+                    <button class="btn waves-effect waves-light bg-main center btn-large" type="submit"
+                            id="submit-form">Download Codes
+                        <i class="material-icons right">arrow_downward</i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let elements = document.querySelectorAll('.sidenav');
+        M.Sidenav.init(elements, {});
+    });
+</script>
+<script src="../index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<!-- JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
