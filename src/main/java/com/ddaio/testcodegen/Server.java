@@ -43,12 +43,18 @@ public class Server extends AbstractVerticle {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(router)
-                .listen(80, "0.0.0.0", result -> {
+                .listen(getPort(), "0.0.0.0", result -> {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> vertx.close()));
+    }
+
+    private int getPort() {
+        String port = System.getProperty("heroku.port", "80");
+        logger.info(port);
+        return Integer.parseInt(port);
     }
 
     private Handler<RoutingContext> logRequestInformation() {

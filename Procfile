@@ -1,0 +1,1 @@
+web: java -Dheroku.port=$PORT -jar target/testcodegen-1.0-SNAPSHOT.jar
