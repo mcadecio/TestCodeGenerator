@@ -42,7 +42,7 @@ class RandomLoginTestCodeGeneratorTest {
         assertEquals(10, result.getQuantity());
         assertEquals(10, result.getTestCodes().size());
     }
-    
+
 
     @Test
     @DisplayName("Generates 0 test codes when the quantity is negative")
