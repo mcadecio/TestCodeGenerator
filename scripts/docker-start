@@ -1,0 +1,2 @@
+docker pull mcadecio/testcodegen
+docker run --name testcodegen -d -p 80:80 mcadecio/testcodegen
