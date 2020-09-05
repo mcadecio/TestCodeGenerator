@@ -42,17 +42,7 @@ class RandomLoginTestCodeGeneratorTest {
         assertEquals(10, result.getQuantity());
         assertEquals(10, result.getTestCodes().size());
     }
-
-    @Test
-    @DisplayName("Generates test codes starting with MIM")
-    void generatestestCodesStartingWithMIM() {
-        request.setLoginBase("MIM")
-                .setQuantity(3);
-
-        TestCodeGenerationResult result = generator.generateTestCodes(request);
-
-        assertAllTestCodesStartWith("MIM", result.getTestCodes(), 3);
-    }
+    
 
     @Test
     @DisplayName("Generates 0 test codes when the quantity is negative")
