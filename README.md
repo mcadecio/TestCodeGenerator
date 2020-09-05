@@ -12,14 +12,14 @@ Frontend designed using HTML5, Materialize and Vanilla JavaScript
 ## Using Docker
 
 * `docker pull mcadecio/testcodegen`
-* `docker run --name testcodegen -d -p 8080:8080 mcadecio/testcodegen`
-* www.localhost:8080
+* `docker run --name testcodegen -d -p 80:80 mcadecio/testcodegen`
+* www.localhost:80
 
 ## Using a Jar
 
 * `mvn clean package`
 * `java -jar target/testcodegen-1.0-SNAPSHOT.jar`
-* www.localhost:8080
+* www.localhost:80
 
 
 ### In case you are wondering what it looks like
