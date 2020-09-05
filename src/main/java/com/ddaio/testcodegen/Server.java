@@ -43,7 +43,7 @@ public class Server extends AbstractVerticle {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(router)
-                .listen(8080, "0.0.0.0", result -> {
+                .listen(80, "0.0.0.0", result -> {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
