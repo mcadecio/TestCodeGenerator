@@ -1,6 +1,10 @@
-package com.ddaio.testcodegen.generator.testcode;
+package com.ddaio.testcodegen.generator.testcode.simple;
 
 import com.ddaio.testcodegen.generator.Generator;
+import com.ddaio.testcodegen.generator.testcode.TestCode;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationRequest;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerator;
 import com.google.inject.Inject;
 
 import java.util.List;

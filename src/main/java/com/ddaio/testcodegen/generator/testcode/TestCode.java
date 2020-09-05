@@ -37,12 +37,11 @@ public class TestCode {
     @Override
     public String toString() {
         return String.format(
-                "%s,%s,%s,%s,%s",
+                "%s,%s,%s,%s",
                 allocateTo,
                 country,
                 login,
-                password,
-                nAttempts
+                password
         );
     }
 }

@@ -1,7 +1,10 @@
-package com.ddaio.testcodegen.generator.testcode;
+package com.ddaio.testcodegen.generator.testcode.random;
 
 import com.ddaio.testcodegen.generator.Generator;
-import com.ddaio.testcodegen.generator.testcode.simple.SimpleTestCodeGenerator;
+import com.ddaio.testcodegen.generator.testcode.TestCode;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationRequest;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,14 +13,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestCodeGeneratorSimpleTest {
+class RandomLoginTestCodeGeneratorTest {
 
-    private final Generator<String> defaultPasswordGenerator = l -> "password";
-    private final TestCodeGenerator generator = new SimpleTestCodeGenerator(defaultPasswordGenerator);
+    private final Generator<String> defaultLoginGenerator = l -> "login";
+    private final TestCodeGenerator generator = new RandomLoginTestCodeGenerator(defaultLoginGenerator);
     private final TestCodeGenerationRequest request = new TestCodeGenerationRequest()
             .setAllocatedTo("Java")
             .setLoginBase("SOUT")
-            .setLoginStartingNumber(10)
             .setPasswordLength(6);
 
     @Test
@@ -64,15 +66,43 @@ class TestCodeGeneratorSimpleTest {
     }
 
     @Test
-    @DisplayName("Generates 2 test codes with two different passwords")
-    void generates2CodesWithDifferentPasswords() {
-        TestCodeGenerator generator = new SimpleTestCodeGenerator(RandomStringUtils::randomAlphanumeric);
+    @DisplayName("Generates 2 test codes with two different logins")
+    void generates2CodesWithDifferentLogins() {
+        TestCodeGenerator generator = new RandomLoginTestCodeGenerator(RandomStringUtils::randomAlphanumeric);
         request.setQuantity(2);
 
         TestCodeGenerationResult result = generator.generateTestCodes(request);
 
         List<TestCode> testCodes = result.getTestCodes();
-        assertNotEquals(testCodes.get(1).getPassword(), testCodes.get(0).getPassword());
+        assertNotEquals(testCodes.get(1).getLogin(), testCodes.get(0).getLogin());
+    }
+
+    @Test
+    @DisplayName("Generates 2 test codes with the same password")
+    void generates2CodesWithEqualPassword() {
+        request.setQuantity(2)
+                .setLoginBase("KSrw15");
+
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
+
+        List<TestCode> testCodes = result.getTestCodes();
+        assertEquals(testCodes.get(0).getPassword(), testCodes.get(1).getPassword());
+        assertEquals( "KSrw15", testCodes.get(0).getPassword());
+    }
+
+
+    @Test
+    @DisplayName("Generates test codes with login length of size 6")
+    void generatesCodesWithLoginLengthEqual6() {
+        TestCodeGenerator generator = new RandomLoginTestCodeGenerator(RandomStringUtils::randomAlphanumeric);
+        request.setQuantity(2)
+                .setPasswordLength(6)
+                .setLoginBase("KSrw15");
+
+        TestCodeGenerationResult result = generator.generateTestCodes(request);
+
+        List<TestCode> testCodes = result.getTestCodes();
+        assertEquals(6, testCodes.get(0).getLogin().length());
     }
 
     private void assertAllTestCodesStartWith(String startingBase, List<TestCode> testCodes, int quantity) {

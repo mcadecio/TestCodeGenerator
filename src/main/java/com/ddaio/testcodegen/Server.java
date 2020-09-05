@@ -1,6 +1,7 @@
 package com.ddaio.testcodegen;
 
-import com.ddaio.testcodegen.generator.testcode.SimpleTestCodeGenerator;
+import com.ddaio.testcodegen.generator.testcode.random.RandomLoginTestCodeGenerator;
+import com.ddaio.testcodegen.generator.testcode.simple.SimpleTestCodeGenerator;
 import com.ddaio.testcodegen.generator.testcode.TestCode;
 import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationRequest;
 import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
@@ -39,6 +40,8 @@ public class Server extends AbstractVerticle {
         router.get("/api/generate/*").handler(logRequestInformation());
         router.get("/api/generate/simple/csv").handler(handleGenerateCSVRequest());
         router.get("/api/generate/simple/raw").handler(handleGenerateRawRequest());
+        router.get("/api/generate/skills/csv").handler(handleGenerateSkillCSVRequest());
+        router.get("/api/generate/randomlogin/csv").handler(handleGenerateRandomLoginCSVRequest());
 
         httpServer = vertx.createHttpServer();
         httpServer
@@ -47,8 +50,50 @@ public class Server extends AbstractVerticle {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> vertx.close()));
+    private Handler<RoutingContext> handleGenerateRandomLoginCSVRequest() {
+        return rc -> {
+             TestCodeGenerationResult result = injector.getInstance(RandomLoginTestCodeGenerator.class)
+                    .generateTestCodes(rc.remove(REQUEST));
+
+            String headers = "Allocated to,Country,Login,Password\n";
+            String content = result.getTestCodes()
+                    .stream()
+                    .map(TestCode::toString)
+                    .collect(Collectors.joining("\n"));
+            try {
+                rc.response()
+                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                        .end(headers + content);
+
+            } catch (Exception e) {
+                rc.response().end("Error: " + e.getMessage());
+            }
+        };
+    }
+
+    private Handler<RoutingContext> handleGenerateSkillCSVRequest() {
+        return rc -> {
+            TestCodeGenerationResult generationResult = generateTestCodes(rc.remove(REQUEST));
+
+            String headers = "Allocated to,Country,Login,Password\n";
+            String content = generationResult.getTestCodes()
+                    .stream()
+                    .map(TestCode::toString)
+                    .collect(Collectors.joining("\n"));
+            try {
+                rc.response()
+                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                        .end(headers + content);
+
+            } catch (Exception e) {
+                rc.response().end("Error: " + e.getMessage());
+            }
+
+        };
     }
 
     private int getPort() {
@@ -64,7 +109,7 @@ public class Server extends AbstractVerticle {
             rc.put(REQUEST, request);
             logger.info("Query param: \"loginBase\" == {}", request.getLoginBase());
             logger.info("Query param: \"loginStartingNumber\" == {}", request.getLoginStartingNumber());
-            logger.info("Query param: \"passwordLength\" == {}",request.getPasswordLength());
+            logger.info("Query param: \"passwordLength\" == {}", request.getPasswordLength());
             logger.info("Query param: \"quantity\" == {}", request.getQuantity());
             logger.info("Query param: \"allocatedTo\" == {}", request.getAllocatedTo());
             rc.next();
@@ -96,12 +141,12 @@ public class Server extends AbstractVerticle {
             String headers = "Allocated to,Country,Login,Password,Number of Attempts\n";
             String content = generationResult.getTestCodes()
                     .stream()
-                    .map(TestCode::toString)
+                    .map(testCode -> String.format("%s,%s", testCode.toString(), testCode.getNAttempts()))
                     .collect(Collectors.joining("\n"));
             try {
                 rc.response()
                         .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=test_codes.csv")
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
                         .end(headers + content);
 
             } catch (Exception e) {
@@ -130,6 +175,7 @@ public class Server extends AbstractVerticle {
     public void stop() {
         logger.info("Shutting Down...");
         httpServer.close(ar -> logger.info("Shutting Down HTTP Server"));
+        vertx.close();
     }
 
     public static void main(String[] args) {
