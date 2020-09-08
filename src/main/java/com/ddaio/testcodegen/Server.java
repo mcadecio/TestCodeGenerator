@@ -7,11 +7,14 @@ import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationRequest;
 import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
 import com.ddaio.testcodegen.module.InjModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.MediaType;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import io.swagger.v3.oas.models.media.Content;
 import io.vertx.core.*;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 public class Server extends AbstractVerticle {
 
     private static final String REQUEST = "request";
+    private static final String TXT_CSV = "text/csv";
+
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Injector injector = Guice.createInjector(new InjModule());
@@ -34,8 +39,10 @@ public class Server extends AbstractVerticle {
 
         final var router = Router.router(vertx);
 
-        router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
         router.get("/*").handler(StaticHandler.create("static"));
+        router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
+
+        router.mountSubRouter("/api/generator", router);
 
         router.get("/api/generate/*").handler(logRequestInformation());
         router.get("/api/generate/simple/csv").handler(handleGenerateCSVRequest());
@@ -57,41 +64,32 @@ public class Server extends AbstractVerticle {
              TestCodeGenerationResult result = injector.getInstance(RandomLoginTestCodeGenerator.class)
                     .generateTestCodes(rc.remove(REQUEST));
 
-            String headers = "Allocated to,Country,Login,Password\n";
-            String content = result.getTestCodes()
-                    .stream()
-                    .map(TestCode::toString)
-                    .collect(Collectors.joining("\n"));
-            try {
-                rc.response()
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
-                        .end(headers + content);
-
-            } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
-            }
+            sendResponse(rc.response(), result);
         };
+    }
+
+    private void sendResponse(HttpServerResponse response, TestCodeGenerationResult result) {
+        String headers = "Allocated to,Country,Login,Password\n";
+        String content = result.getTestCodes()
+                .stream()
+                .map(TestCode::toString)
+                .collect(Collectors.joining("\n"));
+        try {
+            response
+                    .putHeader(HttpHeaders.CONTENT_TYPE, TXT_CSV)
+                    .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                    .end(headers + content);
+
+        } catch (Exception e) {
+            response.end("Error: " + e.getMessage());
+        }
     }
 
     private Handler<RoutingContext> handleGenerateSkillCSVRequest() {
         return rc -> {
             TestCodeGenerationResult generationResult = generateTestCodes(rc.remove(REQUEST));
 
-            String headers = "Allocated to,Country,Login,Password\n";
-            String content = generationResult.getTestCodes()
-                    .stream()
-                    .map(TestCode::toString)
-                    .collect(Collectors.joining("\n"));
-            try {
-                rc.response()
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
-                        .end(headers + content);
-
-            } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
-            }
+            sendResponse(rc.response(), generationResult);
 
         };
     }
