@@ -10,14 +10,14 @@
 
     <properties>
         <java.version>11</java.version>
-        <vertx.version>3.8.5</vertx.version>
+        <vertx.version>4.3.0</vertx.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>3.8.5</version>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

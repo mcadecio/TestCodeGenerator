@@ -7,11 +7,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 public class InjModule extends AbstractModule {
 
-    @Override
-    protected void configure() {
-
-    }
-
     @Provides
     public Generator<String> passwordGenerator() {
         return RandomStringUtils::randomAlphanumeric;

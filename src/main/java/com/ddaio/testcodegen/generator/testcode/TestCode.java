@@ -1,9 +1,8 @@
 package com.ddaio.testcodegen.generator.testcode;
 
 public class TestCode {
+    private static final int DEFAULT_NUMBER_OF_ATTEMPTS = 1;
 
-    private final String country = "";
-    private final int nAttempts = 1;
     private final String allocateTo;
     private final String login;
     private final String password;
@@ -22,16 +21,8 @@ public class TestCode {
         return password;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
     public int getNAttempts() {
-        return nAttempts;
-    }
-
-    public String getAllocateTo() {
-        return allocateTo;
+        return DEFAULT_NUMBER_OF_ATTEMPTS;
     }
 
     @Override
@@ -39,7 +30,7 @@ public class TestCode {
         return String.format(
                 "%s,%s,%s,%s",
                 allocateTo,
-                country,
+                "",
                 login,
                 password
         );

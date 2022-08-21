@@ -8,9 +8,6 @@ public class TestCodeGenerationRequest {
     private int quantity;
     private int passwordLength;
 
-    public TestCodeGenerationRequest() {
-    }
-
     public String getAllocatedTo() {
         return allocatedTo;
     }

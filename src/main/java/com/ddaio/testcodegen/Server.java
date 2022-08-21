@@ -1,5 +1,6 @@
 package com.ddaio.testcodegen;
 
+import com.ddaio.testcodegen.generator.testcode.TestCodeGenerator;
 import com.ddaio.testcodegen.generator.testcode.random.RandomLoginTestCodeGenerator;
 import com.ddaio.testcodegen.generator.testcode.simple.SimpleTestCodeGenerator;
 import com.ddaio.testcodegen.generator.testcode.TestCode;
@@ -8,7 +9,7 @@ import com.ddaio.testcodegen.generator.testcode.TestCodeGenerationResult;
 import com.ddaio.testcodegen.module.InjModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 import io.vertx.core.*;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
@@ -21,13 +22,23 @@ import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors;
 
 public class Server extends AbstractVerticle {
-
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private static final String REQUEST = "request";
+    private static final String TEXT_CSV = "text/csv";
+    private static final String ATTACHMENT_FILENAME_TEST_CODES_CSV = "attachment;filename=test_codes.csv";
+    private static final String ERROR = "Error: ";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Injector injector = Guice.createInjector(new InjModule());
+    private final TestCodeGenerator simpleTestCodeGenerator;
+    private final TestCodeGenerator randomLoginTestCodeGenerator;
 
     private HttpServer httpServer;
+
+    @Inject
+    public Server(SimpleTestCodeGenerator simpleTestCodeGenerator,
+                  RandomLoginTestCodeGenerator randomLoginTestCodeGenerator) {
+        this.simpleTestCodeGenerator = simpleTestCodeGenerator;
+        this.randomLoginTestCodeGenerator = randomLoginTestCodeGenerator;
+    }
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -46,16 +57,16 @@ public class Server extends AbstractVerticle {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(router)
-                .listen(getPort(), "0.0.0.0", result -> {
-                    logger.info("HTTP Server Started ...");
-                    startPromise.complete();
-                });
+                .listen(getPort(), "0.0.0.0")
+                .<Void>mapEmpty()
+                .onSuccess(ignored -> logger.info("HTTP Server Started..."))
+                .onFailure(error -> logger.error("Failed to start HTTP Server", error))
+                .onComplete(startPromise);
     }
 
     private Handler<RoutingContext> handleGenerateRandomLoginCSVRequest() {
         return rc -> {
-             TestCodeGenerationResult result = injector.getInstance(RandomLoginTestCodeGenerator.class)
-                    .generateTestCodes(rc.remove(REQUEST));
+            TestCodeGenerationResult result = randomLoginTestCodeGenerator.generateTestCodes(rc.remove(REQUEST));
 
             String headers = "Allocated to,Country,Login,Password\n";
             String content = result.getTestCodes()
@@ -64,12 +75,12 @@ public class Server extends AbstractVerticle {
                     .collect(Collectors.joining("\n"));
             try {
                 rc.response()
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_CSV)
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME_TEST_CODES_CSV)
                         .end(headers + content);
 
             } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
+                rc.response().end(ERROR + e.getMessage());
             }
         };
     }
@@ -85,12 +96,12 @@ public class Server extends AbstractVerticle {
                     .collect(Collectors.joining("\n"));
             try {
                 rc.response()
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_CSV)
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME_TEST_CODES_CSV)
                         .end(headers + content);
 
             } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
+                rc.response().end(ERROR + e.getMessage());
             }
 
         };
@@ -128,7 +139,7 @@ public class Server extends AbstractVerticle {
                         .end(resultJson);
 
             } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
+                rc.response().end(ERROR + e.getMessage());
             }
         };
     }
@@ -145,12 +156,12 @@ public class Server extends AbstractVerticle {
                     .collect(Collectors.joining("\n"));
             try {
                 rc.response()
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "text/csv")
-                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test_codes.csv")
+                        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_CSV)
+                        .putHeader(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME_TEST_CODES_CSV)
                         .end(headers + content);
 
             } catch (Exception e) {
-                rc.response().end("Error: " + e.getMessage());
+                rc.response().end(ERROR + e.getMessage());
             }
 
         };
@@ -166,9 +177,7 @@ public class Server extends AbstractVerticle {
     }
 
     private TestCodeGenerationResult generateTestCodes(TestCodeGenerationRequest request) {
-        return injector
-                .getInstance(SimpleTestCodeGenerator.class)
-                .generateTestCodes(request);
+        return simpleTestCodeGenerator.generateTestCodes(request);
     }
 
     @Override
@@ -179,7 +188,8 @@ public class Server extends AbstractVerticle {
     }
 
     public static void main(String[] args) {
-        Vertx.vertx().deployVerticle(new Server());
+        var injector = Guice.createInjector(new InjModule());
+        Vertx.vertx().deployVerticle(injector.getInstance(Server.class));
     }
 
 }
